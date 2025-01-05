@@ -1,9 +1,8 @@
 <script lang="ts">
-  import type { DefinedCreateQueryResult } from '@tanstack/svelte-query';
-  import { getContext } from 'svelte';
-  import type { PR } from '../types';
   import { goto } from '$app/navigation';
-  const prsQuery = getContext<DefinedCreateQueryResult<PR[], Error>>('prs');
+  // import type { DefinedCreateQueryResult } from '@tanstack/svelte-query';
+  // import { getContext } from 'svelte';
+  // const prsQuery = getContext<DefinedCreateQueryResult<PR[], Error>>('prs');
 
   const handleRowClick = (id: string) => {
     goto(`/applications/${id}`);
@@ -11,7 +10,7 @@
 </script>
 
 <div class="container">
-  {#if !$prsQuery.isFetched}
+  <!-- {#if !$prsQuery.isFetched}
     <div></div>
   {:else if $prsQuery.isFetched && $prsQuery.data.length === 0}
     <div class="start-application">
@@ -40,7 +39,7 @@
         {/each}
       </tbody>
     </table>
-  {/if}
+  {/if} -->
 </div>
 
 <style>
@@ -48,7 +47,7 @@
     padding: 200px;
   }
 
-  .start-application {
+  /* .start-application {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -81,9 +80,9 @@
     padding: 1rem;
     text-align: left;
     border-bottom: 1px solid #ddd;
-  }
+  } */
 
-  tr:nth-child(even) {
+  /* tr:nth-child(even) {
     background-color: rgb(123, 34, 34);
   }
 
@@ -94,5 +93,5 @@
 
   .clickable-row:hover {
     background-color: rgba(0, 0, 0, 0.05);
-  }
+  } */
 </style>

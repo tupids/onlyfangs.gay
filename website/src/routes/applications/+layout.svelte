@@ -1,45 +1,42 @@
 <script lang="ts">
-  import { createQuery } from '@tanstack/svelte-query';
-  import { setContext } from 'svelte';
-  import type { DefinedCreateQueryResult } from '@tanstack/svelte-query';
-  import type { PR } from '../types';
+  // import { createQuery } from '@tanstack/svelte-query';
+  // import { setContext } from 'svelte';
+  // import type { DefinedCreateQueryResult } from '@tanstack/svelte-query';
+  // import type { PR } from '../types';
 
   let { children } = $props();
-  const prsQuery = createQuery<PR[]>({
-    queryKey: ['prs'],
-    enabled: true,
-    initialData: [],
-    queryFn: async () => {
-      const response = await fetch(
-        // CHANGE THIS TO BE THE USERS OWN APPLICATIONS
-        `https://api.github.com/repos/ScuffleCloud/landing/pulls?state=all`,
-      );
-      const prs: PR[] = await response.json();
+  // const prsQuery = createQuery<PR[]>({
+  //   queryKey: ['prs'],
+  //   enabled: true,
+  //   initialData: [],
+  //   queryFn: async () => {
+  //     const response = await fetch(`${import.meta.env.PUBLIC_API_URL}/applications`);
+  //     const prs: PR[] = await response.json();
 
-      return prs.map((pr: any) => ({
-        id: pr.id,
-        title: pr.title,
-        headRef: pr.head.label,
-        user: pr.user?.login || 'Unassigned',
-      }));
-    },
-  });
+  //     return prs.map((pr: any) => ({
+  //       id: pr.id,
+  //       title: pr.title,
+  //       headRef: pr.head.label,
+  //       user: pr.user?.login || 'Unassigned',
+  //     }));
+  //   },
+  // });
 
-  setContext<DefinedCreateQueryResult<PR[], Error>>('prs', prsQuery);
+  // setContext<DefinedCreateQueryResult<PR[], Error>>('prs', prsQuery);
 </script>
 
-{#if !$prsQuery.isFetched}
+<!-- {#if !$prsQuery.isFetched}
   <div class="spinner-container">
     <div class="spinner"></div>
   </div>
 {:else if $prsQuery.error}
   <p>Error: {$prsQuery.error.message}</p>
-{:else}
+{:else} -->
   {@render children()}
-{/if}
+<!-- {/if} -->
 
 <style>
-  .spinner-container {
+  /* .spinner-container {
     position: fixed;
     top: 0;
     left: 0;
@@ -66,5 +63,5 @@
     100% {
       transform: rotate(360deg);
     }
-  }
+  } */
 </style>

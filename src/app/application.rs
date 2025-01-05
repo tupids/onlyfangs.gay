@@ -58,7 +58,7 @@ struct UpdateApplicationRequest {
 
 #[derive(serde::Serialize)]
 struct UpdateApplicationResponse {
-    id: i32,
+    application_id: i32,
 }
 
 #[derive(Insertable)]
@@ -130,7 +130,7 @@ async fn update_application(
             ApiError::internal_server_error()
         })?;
 
-    Ok(Json(UpdateApplicationResponse { id: application.id }))
+    Ok(Json(UpdateApplicationResponse { application_id: application.id }))
 }
 
 #[derive(serde::Deserialize)]
