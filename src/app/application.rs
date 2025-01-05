@@ -3,7 +3,8 @@ use std::sync::Arc;
 use crate::{database::types::Application, global::Global};
 use axum::{
     extract::Path,
-    routing::{get, post}, Json, Router,
+    routing::{get, post},
+    Json, Router,
 };
 
 use super::{auth::TwitchUserId, error::ApiError};

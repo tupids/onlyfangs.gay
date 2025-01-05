@@ -1,7 +1,8 @@
 use std::sync::Arc;
 
 use axum::{
-    routing::{get, post}, Json, Router,
+    routing::{get, post},
+    Json, Router,
 };
 
 use crate::{database::types::Application, global::Global};

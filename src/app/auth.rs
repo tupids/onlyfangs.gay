@@ -1,9 +1,6 @@
 use std::sync::Arc;
 
-use axum::{
-    async_trait,
-    http::request::Parts,
-};
+use axum::{async_trait, http::request::Parts};
 use jsonwebtoken::{Algorithm, DecodingKey, Validation};
 
 use crate::global::Global;
@@ -59,20 +56,16 @@ impl axum::extract::FromRequestParts<Arc<Global>> for TwitchUserId {
         let token = req
             .headers
             .get("Authorization")
-            .and_then(|header| header.to_str().ok());
-        if let Some(token) = token {
-            let jwt_secret = DecodingKey::from_secret(global.config.jwt_secret.as_bytes());
-            let Ok(claims) = jsonwebtoken::decode::<Claims>(
-                token,
-                &jwt_secret,
-                &Validation::new(Algorithm::HS256),
-            ) else {
-                return Err(ApiError::unauthorized());
-            };
+            .and_then(|header| header.to_str().ok())
+            .ok_or_else(ApiError::unauthorized)?;
 
-            Ok(TwitchUserId(claims.claims.twitch_user_id))
-        } else {
-            Err(ApiError::unauthorized())
-        }
+        let jwt_secret = DecodingKey::from_secret(global.config.jwt_secret.as_bytes());
+        let Ok(claims) =
+            jsonwebtoken::decode::<Claims>(token, &jwt_secret, &Validation::new(Algorithm::HS256))
+        else {
+            return Err(ApiError::unauthorized());
+        };
+
+        Ok(TwitchUserId(claims.claims.twitch_user_id))
     }
 }
