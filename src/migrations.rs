@@ -10,8 +10,7 @@ pub async fn run_migrations<A>(async_connection: A) -> anyhow::Result<()>
 where
     A: AsyncConnection<Backend = Pg> + 'static,
 {
-    let mut async_wrapper: AsyncConnectionWrapper<A> =
-        AsyncConnectionWrapper::from(async_connection);
+    let mut async_wrapper: AsyncConnectionWrapper<A> = AsyncConnectionWrapper::from(async_connection);
 
     tokio::task::spawn_blocking(move || {
         async_wrapper

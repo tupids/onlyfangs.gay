@@ -1,17 +1,12 @@
 use chrono::{DateTime, Utc};
-use diesel::{
-    pg::Pg,
-    prelude::Queryable,
-    query_dsl::methods::{FindDsl, SelectDsl},
-    OptionalExtension, Selectable, SelectableHelper,
-};
-use diesel_async::AsyncPgConnection;
-use diesel_async::RunQueryDsl;
+use diesel::pg::Pg;
+use diesel::prelude::Queryable;
+use diesel::query_dsl::methods::{FindDsl, SelectDsl};
+use diesel::{OptionalExtension, Selectable, SelectableHelper};
+use diesel_async::{AsyncPgConnection, RunQueryDsl};
 
-use super::{
-    enums::{ApplicationStatus, TwitchAccountType},
-    schema,
-};
+use super::enums::{ApplicationStatus, TwitchAccountType};
+use super::schema;
 
 #[derive(Debug, serde::Serialize, Selectable, Queryable)]
 #[diesel(table_name = schema::applications)]
@@ -34,10 +29,7 @@ pub struct Application {
 }
 
 impl Application {
-    pub async fn fetch_by_id(
-        conn: &mut AsyncPgConnection,
-        id: i32,
-    ) -> anyhow::Result<Option<Self>> {
+    pub async fn fetch_by_id(conn: &mut AsyncPgConnection, id: i32) -> anyhow::Result<Option<Self>> {
         let application: Option<Self> = schema::applications::dsl::applications
             .find(id)
             .select(Application::as_select())

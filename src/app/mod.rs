@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use std::sync::Arc;
 
 use anyhow::Context;
@@ -5,6 +6,7 @@ use axum::Router;
 use error::ApiError;
 use scuffle_context::ContextFutExt;
 use scuffle_http::backend::HttpServer;
+use tower_http::services::{ServeDir, ServeFile};
 
 use crate::global::Global;
 
@@ -14,13 +16,26 @@ mod auth;
 mod error;
 mod login;
 
-fn routes(global: Arc<Global>) -> Router {
+fn api_routes(global: Arc<Global>) -> Router {
     Router::new()
         .nest("/login", login::routes())
         .nest("/applications", applications::routes())
         .nest("/application", application::routes())
         .with_state(global)
         .fallback(not_found)
+}
+
+fn routes(global: Arc<Global>) -> Router {
+    let dist_dir = PathBuf::from(&global.config.vite_dist_dir);
+
+    Router::new().nest("/api", api_routes(global.clone())).nest_service(
+        "/",
+        ServeDir::new(&dist_dir)
+            .not_found_service(ServeFile::new(dist_dir.join("fallback.html")))
+            .precompressed_br()
+            .precompressed_gzip()
+            .append_index_html_on_directories(true),
+    )
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -50,12 +65,7 @@ pub async fn svc(global: Arc<Global>, ctx: scuffle_context::Context) -> anyhow::
 
     tracing::info!("server started");
 
-    server
-        .wait()
-        .with_context(&ctx)
-        .await
-        .transpose()
-        .context("server wait")?;
+    server.wait().with_context(&ctx).await.transpose().context("server wait")?;
 
     tracing::info!("shutting down server");
 

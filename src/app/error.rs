@@ -1,6 +1,8 @@
 use std::borrow::Cow;
 
-use axum::{http::StatusCode, response::IntoResponse, Json};
+use axum::http::StatusCode;
+use axum::response::IntoResponse;
+use axum::Json;
 
 #[derive(Debug, serde::Serialize)]
 pub struct ApiError {
@@ -22,10 +24,7 @@ impl ApiError {
     }
 
     pub const fn internal_server_error() -> Self {
-        ApiError::new(
-            StatusCode::INTERNAL_SERVER_ERROR,
-            Cow::Borrowed("Internal server error"),
-        )
+        ApiError::new(StatusCode::INTERNAL_SERVER_ERROR, Cow::Borrowed("Internal server error"))
     }
 
     pub const fn not_found() -> Self {
@@ -37,10 +36,7 @@ impl ApiError {
     }
 
     pub const fn not_implemented() -> Self {
-        ApiError::new(
-            StatusCode::NOT_IMPLEMENTED,
-            Cow::Borrowed("Not implemented"),
-        )
+        ApiError::new(StatusCode::NOT_IMPLEMENTED, Cow::Borrowed("Not implemented"))
     }
 
     pub fn bad_request(message: impl Into<Cow<'static, str>>) -> Self {

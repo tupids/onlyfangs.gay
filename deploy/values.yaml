@@ -1,0 +1,11 @@
+envFrom:
+  - secretRef:
+      name: onlyfangs-secrets
+
+httpRoute:
+  enabled: true
+  parentRefs:
+    - name: onlyfangs-gateway
+      namespace: cloudflare-gateway
+  hostnames:
+    - "onlyfangs.gay"

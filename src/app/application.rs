@@ -1,29 +1,19 @@
 use std::sync::Arc;
 
-use crate::{
-    database::{
-        enums::ApplicationStatus,
-        schema,
-        types::{Application, ApplicationComment},
-    },
-    global::Global,
-};
-use axum::{
-    extract::{Path, State},
-    routing::{get, post},
-    Json, Router,
-};
-use diesel::{
-    prelude::Insertable,
-    query_dsl::methods::{FilterDsl, FindDsl, SelectDsl},
-    ExpressionMethods, SelectableHelper,
-};
+use axum::extract::{Path, State};
+use axum::routing::{get, post};
+use axum::{Json, Router};
+use diesel::prelude::Insertable;
+use diesel::query_dsl::methods::{FilterDsl, FindDsl, SelectDsl};
+use diesel::{ExpressionMethods, SelectableHelper};
 use diesel_async::RunQueryDsl;
 
-use super::{
-    auth::{TwitchAdminUser, TwitchUser},
-    error::ApiError,
-};
+use super::auth::{TwitchAdminUser, TwitchUser};
+use super::error::ApiError;
+use crate::database::enums::ApplicationStatus;
+use crate::database::schema;
+use crate::database::types::{Application, ApplicationComment};
+use crate::global::Global;
 
 pub fn routes() -> Router<Arc<Global>> {
     Router::new()
@@ -54,12 +44,7 @@ async fn get_application(
         })?
         .ok_or_else(ApiError::not_found)?;
 
-    if application.twitch_id != user.twitch_user_id
-        && !global
-            .config
-            .admin_twitch_ids
-            .contains(&user.twitch_user_id)
-    {
+    if application.twitch_id != user.twitch_user_id && !global.config.admin_twitch_ids.contains(&user.twitch_user_id) {
         return Err(ApiError::not_found());
     }
 
@@ -181,10 +166,7 @@ async fn add_comment(
         .ok_or_else(ApiError::not_found)?;
 
     if application.twitch_id != twitch_user_id.twitch_user_id
-        && !global
-            .config
-            .admin_twitch_ids
-            .contains(&twitch_user_id.twitch_user_id)
+        && !global.config.admin_twitch_ids.contains(&twitch_user_id.twitch_user_id)
     {
         return Err(ApiError::not_found());
     }
@@ -235,10 +217,7 @@ async fn get_comments(
         .ok_or_else(ApiError::not_found)?;
 
     if application.twitch_id != twitch_user_id.twitch_user_id
-        && !global
-            .config
-            .admin_twitch_ids
-            .contains(&twitch_user_id.twitch_user_id)
+        && !global.config.admin_twitch_ids.contains(&twitch_user_id.twitch_user_id)
     {
         return Err(ApiError::not_found());
     }

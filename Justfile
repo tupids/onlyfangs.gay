@@ -53,5 +53,5 @@ _diesel-generate-unpatched:
 _diesel-generate-unpatched-helper:
 	diesel print-schema --patch-file=<(echo '')
 
-docker-build TAG='scuffle-brawl:latest':
+docker-build TAG='onlyfangs:latest':
 	docker build -t {{TAG}} -f server/Dockerfile .

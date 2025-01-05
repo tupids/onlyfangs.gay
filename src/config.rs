@@ -6,7 +6,8 @@ use rand::Rng;
 #[serde(default)]
 pub struct Config {
     #[default(env_or_default("DATABASE_URL", None))]
-    pub database_url: Option<String>,
+    pub db_url: Option<String>,
+    #[default(env_or_default("LOG_LEVEL", "info"))]
     pub level: String,
     #[default(None)]
     pub telemetry_bind: Option<SocketAddr>,
@@ -17,6 +18,12 @@ pub struct Config {
     pub twitch: TwitchConfig,
     #[default(random_secret())]
     pub jwt_secret: String,
+    #[default(env_or_default("PUBLIC_API_URL", "https://onlyfangs.gay/api"))]
+    pub api_url: String,
+    #[default(env_or_default("PUBLIC_APP_URL", "https://onlyfangs.gay"))]
+    pub app_url: String,
+    #[default(env_or_default("VITE_DIST_DIR", "dist"))]
+    pub vite_dist_dir: String,
 }
 
 #[derive(Default, serde::Deserialize, Debug)]
@@ -35,9 +42,7 @@ fn random_secret() -> String {
 }
 
 fn env_or_default<T: From<String>>(key: &'static str, default: impl Into<T>) -> T {
-    std::env::var(key)
-        .map(Into::into)
-        .unwrap_or_else(|_| default.into())
+    std::env::var(key).map(Into::into).unwrap_or_else(|_| default.into())
 }
 
 scuffle_settings::bootstrap!(Config);

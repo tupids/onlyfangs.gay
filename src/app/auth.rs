@@ -1,11 +1,12 @@
 use std::sync::Arc;
 
-use axum::{async_trait, http::request::Parts};
+use axum::async_trait;
+use axum::http::request::Parts;
 use jsonwebtoken::{Algorithm, DecodingKey, Validation};
 
-use crate::{database::enums::TwitchAccountType, global::Global};
-
 use super::error::ApiError;
+use crate::database::enums::TwitchAccountType;
+use crate::global::Global;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct User {
@@ -29,9 +30,7 @@ impl TwitchUser {
             .ok_or_else(ApiError::unauthorized)?;
 
         let jwt_secret = DecodingKey::from_secret(global.config.jwt_secret.as_bytes());
-        let Ok(claims) =
-            jsonwebtoken::decode::<User>(token, &jwt_secret, &Validation::new(Algorithm::HS256))
-        else {
+        let Ok(claims) = jsonwebtoken::decode::<User>(token, &jwt_secret, &Validation::new(Algorithm::HS256)) else {
             return Err(ApiError::unauthorized());
         };
 
@@ -45,10 +44,7 @@ pub struct TwitchAdminUser(pub User);
 impl axum::extract::FromRequestParts<Arc<Global>> for TwitchUser {
     type Rejection = ApiError;
 
-    async fn from_request_parts(
-        req: &mut Parts,
-        global: &Arc<Global>,
-    ) -> Result<Self, Self::Rejection> {
+    async fn from_request_parts(req: &mut Parts, global: &Arc<Global>) -> Result<Self, Self::Rejection> {
         TwitchUser::extract(req, global).await
     }
 }
@@ -57,17 +53,10 @@ impl axum::extract::FromRequestParts<Arc<Global>> for TwitchUser {
 impl axum::extract::FromRequestParts<Arc<Global>> for TwitchAdminUser {
     type Rejection = ApiError;
 
-    async fn from_request_parts(
-        req: &mut Parts,
-        global: &Arc<Global>,
-    ) -> Result<Self, Self::Rejection> {
+    async fn from_request_parts(req: &mut Parts, global: &Arc<Global>) -> Result<Self, Self::Rejection> {
         let TwitchUser(twitch_user_id) = TwitchUser::extract(req, global).await?;
 
-        if !global
-            .config
-            .admin_twitch_ids
-            .contains(&twitch_user_id.twitch_user_id)
-        {
+        if !global.config.admin_twitch_ids.contains(&twitch_user_id.twitch_user_id) {
             return Err(ApiError::unauthorized());
         }
 

@@ -1,4 +1,5 @@
-use diesel_async::{pooled_connection::bb8, AsyncPgConnection};
+use diesel_async::pooled_connection::bb8;
+use diesel_async::AsyncPgConnection;
 
 use crate::config::Config;
 

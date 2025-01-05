@@ -1,28 +1,18 @@
 use std::sync::Arc;
 
-use axum::{
-    extract::{Query, State},
-    routing::{get, post},
-    Json, Router,
-};
-use diesel::{
-    prelude::Insertable, ExpressionMethods, PgTextExpressionMethods, QueryDsl, SelectableHelper,
-};
+use axum::extract::{Query, State};
+use axum::routing::{get, post};
+use axum::{Json, Router};
+use diesel::prelude::Insertable;
+use diesel::{ExpressionMethods, PgTextExpressionMethods, QueryDsl, SelectableHelper};
 use diesel_async::RunQueryDsl;
 
-use crate::{
-    database::{
-        enums::{ApplicationStatus, TwitchAccountType},
-        schema,
-        types::Application,
-    },
-    global::Global,
-};
-
-use super::{
-    auth::{TwitchAdminUser, TwitchUser},
-    error::ApiError,
-};
+use super::auth::{TwitchAdminUser, TwitchUser};
+use super::error::ApiError;
+use crate::database::enums::{ApplicationStatus, TwitchAccountType};
+use crate::database::schema;
+use crate::database::types::Application;
+use crate::global::Global;
 
 pub fn routes() -> Router<Arc<Global>> {
     Router::new()
@@ -59,15 +49,12 @@ async fn get_applications(
     }
 
     if let Some(twitch_account_type) = request.twitch_account_type {
-        query =
-            query.filter(schema::applications::dsl::twitch_account_type.eq(twitch_account_type));
+        query = query.filter(schema::applications::dsl::twitch_account_type.eq(twitch_account_type));
     }
 
     if let Some(min_follow_count) = request.min_follow_count {
         if min_follow_count < 0 {
-            return Err(ApiError::bad_request(
-                "min_follow_count must be greater than 0",
-            ));
+            return Err(ApiError::bad_request("min_follow_count must be greater than 0"));
         }
 
         query = query.filter(schema::applications::dsl::follow_count.ge(min_follow_count));
@@ -78,9 +65,7 @@ async fn get_applications(
             return Err(ApiError::bad_request("twitch_username too long"));
         }
 
-        query = query.filter(
-            schema::applications::dsl::twitch_username.ilike(format!("%{}%", twitch_username)),
-        );
+        query = query.filter(schema::applications::dsl::twitch_username.ilike(format!("%{}%", twitch_username)));
     }
 
     let applications = query

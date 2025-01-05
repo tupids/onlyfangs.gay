@@ -2,9 +2,12 @@ use std::sync::Arc;
 
 use anyhow::Context;
 use database::schema::health_check;
-use diesel::{query_dsl::methods::FindDsl, ExpressionMethods};
+use diesel::query_dsl::methods::FindDsl;
+use diesel::ExpressionMethods;
 use diesel_async::{AsyncConnection, RunQueryDsl};
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, Layer};
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::util::SubscriberInitExt;
+use tracing_subscriber::Layer;
 
 mod app;
 mod config;
@@ -21,16 +24,13 @@ impl scuffle_bootstrap::Global for global::Global {
                 tracing_subscriber::fmt::layer()
                     .with_file(true)
                     .with_line_number(true)
-                    .with_filter(
-                        tracing_subscriber::EnvFilter::from_default_env()
-                            .add_directive(config.level.parse()?),
-                    ),
+                    .with_filter(tracing_subscriber::EnvFilter::from_default_env().add_directive(config.level.parse()?)),
             )
             .init();
 
         tracing::info!("starting server.");
 
-        let Some(db_url) = config.database_url.as_deref() else {
+        let Some(db_url) = config.db_url.as_deref() else {
             anyhow::bail!("DATABASE_URL is not set");
         };
 
@@ -59,9 +59,7 @@ async fn run_migrations(url: &str) -> anyhow::Result<()> {
         .await
         .context("establish connection")?;
 
-    migrations::run_migrations(conn)
-        .await
-        .context("run migrations")?;
+    migrations::run_migrations(conn).await.context("run migrations")?;
 
     Ok(())
 }
@@ -79,11 +77,7 @@ impl scuffle_bootstrap_telemetry::TelemetryConfig for global::Global {
     }
 
     async fn health_check(&self) -> Result<(), anyhow::Error> {
-        let mut conn = self
-            .database
-            .get()
-            .await
-            .context("get database connection")?;
+        let mut conn = self.database.get().await.context("get database connection")?;
 
         // Health check to see if the database is healthy and can be reached.
         // We do an update here because we want to make sure the database is
