@@ -1,15 +1,18 @@
 <script lang="ts">
-  import image1Url from '$lib/images/soda.webp';
-  import image2Url from '$lib/images/tyler1.webp';
+  import sodaImageUrl from '$lib/images/soda.webp?url';
+  import tyler1ImageUrl from '$lib/images/tyler1.webp?url';
+  import lacariImageUrl from '$lib/images/lacari.webp?url';
 </script>
 
 <div class="container">
   <h1>OnlyFangs Signup</h1>
 
   <button class="twitch-button"> Login with Twitch </button>
-  <img src={image1Url} alt="fasd" class="floating-image image1" />
+  <img src={sodaImageUrl} alt="fasd" class="floating-image image1" />
 
-  <img src={image2Url} alt="fads" class="floating-image image2" />
+  <img src={tyler1ImageUrl} alt="fads" class="floating-image image2" />
+
+  <img src={lacariImageUrl} alt="fads" class="floating-image image3" />
 </div>
 
 <style>
@@ -44,6 +47,12 @@
     bottom: 20%;
     right: 15%;
     transform: rotate(7deg);
+  }
+
+  .image3 {
+    bottom: 10%;
+    left: 15%;
+    transform: rotate(5deg);
   }
 
   .twitch-button {

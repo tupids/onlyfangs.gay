@@ -18,12 +18,13 @@ COPY website .
 ARG APP_URL=https://onlyfangs.gay
 ARG API_URL=https://onlyfangs.gay/api
 
-ENV NODE_ENV=production
 ENV PUBLIC_API_URL=${API_URL}
 ENV PUBLIC_APP_URL=${APP_URL}
 
 RUN npm install -g pnpm
 RUN pnpm install --frozen-lockfile
+
+ENV NODE_ENV=production
 RUN pnpm run build
 
 # Runtime
