@@ -11,6 +11,7 @@
     initialData: [],
     queryFn: async () => {
       const response = await fetch(
+        // CHANGE THIS TO BE THE USERS OWN APPLICATIONS
         `https://api.github.com/repos/ScuffleCloud/landing/pulls?state=all`,
       );
       const prs: PR[] = await response.json();

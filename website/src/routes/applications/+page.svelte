@@ -2,7 +2,12 @@
   import type { DefinedCreateQueryResult } from '@tanstack/svelte-query';
   import { getContext } from 'svelte';
   import type { PR } from '../types';
+  import { goto } from '$app/navigation';
   const prsQuery = getContext<DefinedCreateQueryResult<PR[], Error>>('prs');
+
+  const handleRowClick = (id: string) => {
+    goto(`/applications/${id}`);
+  };
 </script>
 
 <div class="container">
@@ -26,7 +31,7 @@
       </thead>
       <tbody>
         {#each $prsQuery.data as pr (pr.id)}
-          <tr>
+          <tr on:click={() => handleRowClick(pr.id.toString())} class="clickable-row">
             <td>{pr.id}</td>
             <td>{pr.title}</td>
             <td>{pr.headRef}</td>
@@ -80,5 +85,14 @@
 
   tr:nth-child(even) {
     background-color: rgb(123, 34, 34);
+  }
+
+  .clickable-row {
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .clickable-row:hover {
+    background-color: rgba(0, 0, 0, 0.05);
   }
 </style>
