@@ -33,7 +33,7 @@ FROM debian:bookworm-slim
 
 LABEL org.opencontainers.image.source="https://github.com/tupids/onlyfangs.gay" \
       org.opencontainers.image.description="Onlyfangs Application API" \
-      org.opencontainers.image.licenses="MIT OR Apache-2.0"
+      org.opencontainers.image.licenses="WTFPL"
 
 COPY --from=api-builder /app/target/release/onlyfangs /usr/local/bin/onlyfangs
 COPY --from=api-builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
