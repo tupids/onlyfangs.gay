@@ -3,8 +3,6 @@ node_modules
 # Output
 .output
 .vercel
-.netlify
-.wrangler
 /.svelte-kit
 /build
 
@@ -13,8 +11,7 @@ node_modules
 Thumbs.db
 
 # Env
-.env
-.env.*
+.env.local
 !.env.example
 !.env.test
 
