@@ -1,0 +1,30 @@
+[package]
+name = "onlyfans-application"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+diesel = { version = "2.2.6", features = ["chrono"] }
+diesel-async = { version = "0.5.2", features = ["postgres", "bb8", "async-connection-wrapper"] }
+chrono = { version = "0.4.39", features = ["serde"] }
+tokio = { version = "1.39.0", features = ["full"] }
+futures = "0.3.31"
+axum = { version = "0.7.9", features = ["macros"] }
+smart-default = "0.7.1"
+serde = { version = "1.0.215", features = ["derive"] }
+serde_json = "1.0.134"
+scuffle-bootstrap = "0.0.2"
+scuffle-settings = { version = "0.0.2", features = ["bootstrap", "toml", "templates"] }
+scuffle-context = "0.0.2"
+scuffle-signal = { version = "0.0.2", features = ["bootstrap"] }
+scuffle-metrics = { version = "0.0.4", features = ["prometheus"] }
+scuffle-bootstrap-telemetry = "0.0.3"
+scuffle-http = { version = "0.0.4", features = ["axum"] }
+async-trait = "0.1"
+jsonwebtoken = "9.3.0"
+anyhow = "1.0.77"
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+diesel_migrations = "2.2.0"
+rand = "0.8.5"
+hex = "0.4.3"
