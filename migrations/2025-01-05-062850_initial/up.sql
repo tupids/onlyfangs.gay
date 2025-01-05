@@ -14,20 +14,20 @@ CREATE TABLE applications (
     support_clip_url TEXT NOT NULL CHECK (LENGTH(support_clip_url) <= 1000),
     follow_count INT NOT NULL,
     connecting_ip_address INET NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    completed_at TIMESTAMP
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    completed_at TIMESTAMPTZ
 );
 
 CREATE TABLE application_comments (
     id SERIAL PRIMARY KEY,
-    application_id INT NOT NULL REFERENCES applications (twitch_id),
+    application_id INT NOT NULL REFERENCES applications (id),
     comment TEXT NOT NULL CHECK (LENGTH(comment) <= 1000),
     twitch_user_id INT NOT NULL,
     twitch_username TEXT NOT NULL,
     twitch_display_name TEXT NOT NULL,
     twitch_profile_image_url TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX ON applications (status, twitch_account_type, follow_count, created_at);

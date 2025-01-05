@@ -1,23 +1,22 @@
 use chrono::{DateTime, Utc};
+use diesel::{
+    pg::Pg,
+    prelude::Queryable,
+    query_dsl::methods::{FilterDsl, FindDsl, SelectDsl},
+    ExpressionMethods, OptionalExtension, Selectable, SelectableHelper,
+};
+use diesel_async::AsyncPgConnection;
+use diesel_async::RunQueryDsl;
 
-#[derive(Debug, serde::Serialize)]
-#[serde(rename_all = "snake_case")]
-pub enum TwitchAccountType {
-    Pleb,
-    Affiliate,
-    Partner,
-}
+use super::{
+    enums::{ApplicationStatus, TwitchAccountType},
+    schema,
+};
 
-#[derive(Debug, serde::Serialize)]
-#[serde(rename_all = "snake_case")]
-pub enum ApplicationStatus {
-    Pending,
-    Approved,
-    Maybe,
-    Rejected,
-}
-
-#[derive(Debug, serde::Serialize)]
+#[derive(Debug, serde::Serialize, Selectable, Queryable)]
+#[diesel(table_name = schema::applications)]
+#[diesel(primary_key(id))]
+#[diesel(check_for_backend(Pg))]
 pub struct Application {
     pub id: i32,
     pub twitch_id: i32,
@@ -32,16 +31,50 @@ pub struct Application {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub completed_at: Option<DateTime<Utc>>,
-    pub comments: Vec<Comment>,
 }
 
-#[derive(Debug, serde::Serialize)]
-pub struct Comment {
+impl Application {
+    pub async fn fetch_by_id(
+        conn: &mut AsyncPgConnection,
+        id: i32,
+    ) -> anyhow::Result<Option<Self>> {
+        let application: Option<Self> = schema::applications::dsl::applications
+            .find(id)
+            .select(Application::as_select())
+            .get_result(conn)
+            .await
+            .optional()?;
+
+        Ok(application)
+    }
+}
+
+#[derive(Debug, serde::Serialize, Queryable, Selectable)]
+#[diesel(table_name = schema::application_comments)]
+#[diesel(primary_key(id))]
+#[diesel(check_for_backend(Pg))]
+pub struct ApplicationComment {
     pub id: i32,
+    pub application_id: i32,
     pub comment: String,
     pub twitch_user_id: i32,
     pub twitch_username: String,
     pub twitch_display_name: String,
     pub twitch_profile_image_url: String,
     pub created_at: DateTime<Utc>,
+}
+
+impl ApplicationComment {
+    pub async fn fetch_by_application_id(
+        conn: &mut AsyncPgConnection,
+        application_id: i32,
+    ) -> anyhow::Result<Vec<Self>> {
+        let comments: Vec<Self> = schema::application_comments::dsl::application_comments
+            .filter(schema::application_comments::dsl::application_id.eq(application_id))
+            .select(ApplicationComment::as_select())
+            .load(conn)
+            .await?;
+
+        Ok(comments)
+    }
 }

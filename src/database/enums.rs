@@ -8,8 +8,9 @@ macro_rules! impl_enum {
             $variant:ident => $value:literal
         ),*$(,)?
     }) => {
-        #[derive(Debug, Clone, Copy, PartialEq, Eq, ::diesel::deserialize::FromSqlRow, ::diesel::expression::AsExpression)]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, ::diesel::deserialize::FromSqlRow, ::diesel::expression::AsExpression)]
         #[diesel(sql_type = $sql_type)]
+        #[serde(rename_all = "snake_case")]
         pub enum $enum {
             $(
                 $variant,
