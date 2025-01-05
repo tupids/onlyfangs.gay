@@ -1,26 +1,15 @@
 <script lang="ts">
   import image1Url from '$lib/images/soda.webp';
   import image2Url from '$lib/images/tyler1.webp';
-
 </script>
 
 <div class="container">
   <h1>OnlyFangs Signup</h1>
-    
-  <button class="twitch-button">
-    Login with Twitch
-  </button>
-  <img 
-    src={image1Url} 
-    alt="fasd" 
-    class="floating-image image1"
-  />
-  
-  <img 
-    src={image2Url} 
-    alt="fads" 
-    class="floating-image image2"
-  />
+
+  <button class="twitch-button"> Login with Twitch </button>
+  <img src={image1Url} alt="fasd" class="floating-image image1" />
+
+  <img src={image2Url} alt="fads" class="floating-image image2" />
 </div>
 
 <style>
@@ -82,7 +71,7 @@
       max-width: 80%;
       height: auto;
     }
-    
+
     h1 {
       font-size: 2rem;
     }

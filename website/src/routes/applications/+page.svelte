@@ -1,51 +1,24 @@
 <script lang="ts">
-  import { createQuery } from '@tanstack/svelte-query';
-  const owner = 'ScuffleCloud';
-  const repo = 'landing';
-
-  type PR = {
-    id: number;
-    title: string;
-    headRef: string;
-    user: string;
-  };
-
-//   REPLACE WITH APPLICATIONS QUERY
-  const prsQuery = createQuery<PR[]>({
-    queryKey: ['prs'],
-    initialData: [],
-    queryFn: async () => {
-      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/pulls?state=all`);
-      const prs: PR[] = await response.json();
-
-      return prs.map((pr: any) => ({
-        id: pr.id,
-        title: pr.title,
-        headRef: pr.head.label,
-        user: pr.user?.login || 'Unassigned',
-      }));
-    },
-  });
-
+  import type { DefinedCreateQueryResult } from '@tanstack/svelte-query';
+  import { getContext } from 'svelte';
+  import type { PR } from '../types';
+  const prsQuery = getContext<DefinedCreateQueryResult<PR[], Error>>('prs');
 </script>
 
 <div class="container">
-  {#if $prsQuery.isLoading}
-    <div class="loading">Loading...</div>
-  {:else if $prsQuery.isError}
-    <div class="error">Error: {$prsQuery.error.message}</div>
-  {:else if $prsQuery.data.length === 0}
+  {#if !$prsQuery.isFetched}
+    <div></div>
+  {:else if $prsQuery.isFetched && $prsQuery.data.length === 0}
     <div class="start-application">
       <button>Start Application</button>
     </div>
-  {:else}
-  <h1>My applications</h1>
+  {:else if $prsQuery.isFetched && $prsQuery.data.length > 0}
+    <h1>My applications</h1>
     <table>
       <thead>
         <tr>
           {#each ['id', 'title', 'headRef', 'user'] as header}
-            <th
-            >
+            <th>
               {header.charAt(0).toUpperCase() + header.slice(1)}
             </th>
           {/each}
@@ -80,7 +53,7 @@
   button {
     padding: 1rem 2rem;
     font-size: 1.2rem;
-    background-color: #4CAF50;
+    background-color: #4caf50;
     color: white;
     border: none;
     border-radius: 4px;
@@ -107,15 +80,5 @@
 
   tr:nth-child(even) {
     background-color: rgb(123, 34, 34);
-  }
-
-  .loading,
-  .error {
-    padding: 20px;
-    text-align: center;
-  }
-
-  .error {
-    color: red;
   }
 </style>
