@@ -10,8 +10,7 @@
     user: string;
   };
 
-  let searchQuery = $state('');
-
+//   REPLACE WITH APPLICATIONS QUERY
   const prsQuery = createQuery<PR[]>({
     queryKey: ['prs'],
     initialData: [],
@@ -31,12 +30,16 @@
 </script>
 
 <div class="container">
-  <h1>My applications</h1>
   {#if $prsQuery.isLoading}
     <div class="loading">Loading...</div>
   {:else if $prsQuery.isError}
     <div class="error">Error: {$prsQuery.error.message}</div>
+  {:else if $prsQuery.data.length === 0}
+    <div class="start-application">
+      <button>Start Application</button>
+    </div>
   {:else}
+  <h1>My applications</h1>
     <table>
       <thead>
         <tr>
@@ -67,15 +70,37 @@
     padding: 200px;
   }
 
+  .start-application {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+  }
+
+  button {
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  button:hover {
+    background-color: #45a049;
+  }
+
   table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    margin-top: 1rem;
   }
 
   th,
   td {
-    padding: 20px;
+    padding: 1rem;
     text-align: left;
     border-bottom: 1px solid #ddd;
   }
