@@ -3,56 +3,25 @@ use std::sync::Arc;
 use axum::{async_trait, http::request::Parts};
 use jsonwebtoken::{Algorithm, DecodingKey, Validation};
 
-use crate::global::Global;
+use crate::{database::enums::TwitchAccountType, global::Global};
 
 use super::error::ApiError;
 
-#[derive(Clone)]
-pub struct AuthLayer {
-    pub jwt_secret: Arc<DecodingKey>,
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct User {
+    pub twitch_user_id: i32,
+    pub twitch_username: String,
+    pub twitch_display_name: String,
+    pub twitch_profile_image_url: String,
+    pub twitch_account_type: TwitchAccountType,
+    pub follow_count: i32,
 }
 
-impl<S> tower::Layer<S> for AuthLayer {
-    type Service = AuthMiddleware<S>;
+#[derive(Debug, Clone)]
+pub struct TwitchUser(pub User);
 
-    fn layer(&self, inner: S) -> Self::Service {
-        AuthMiddleware {
-            jwt_secret: self.jwt_secret.clone(),
-            next: inner,
-        }
-    }
-}
-
-#[derive(Clone)]
-pub struct AuthMiddleware<S> {
-    pub jwt_secret: Arc<DecodingKey>,
-    pub next: S,
-}
-
-impl AuthLayer {
-    pub fn new(jwt_secret: &str) -> Self {
-        Self {
-            jwt_secret: Arc::from(DecodingKey::from_secret(jwt_secret.as_bytes())),
-        }
-    }
-}
-
-#[derive(Debug, serde::Serialize, serde::Deserialize)]
-struct Claims {
-    twitch_user_id: i32,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub struct TwitchUserId(pub i32);
-
-#[async_trait]
-impl axum::extract::FromRequestParts<Arc<Global>> for TwitchUserId {
-    type Rejection = ApiError;
-
-    async fn from_request_parts(
-        req: &mut Parts,
-        global: &Arc<Global>,
-    ) -> Result<Self, Self::Rejection> {
+impl TwitchUser {
+    pub async fn extract(req: &mut Parts, global: &Arc<Global>) -> Result<Self, ApiError> {
         let token = req
             .headers
             .get("Authorization")
@@ -61,11 +30,47 @@ impl axum::extract::FromRequestParts<Arc<Global>> for TwitchUserId {
 
         let jwt_secret = DecodingKey::from_secret(global.config.jwt_secret.as_bytes());
         let Ok(claims) =
-            jsonwebtoken::decode::<Claims>(token, &jwt_secret, &Validation::new(Algorithm::HS256))
+            jsonwebtoken::decode::<User>(token, &jwt_secret, &Validation::new(Algorithm::HS256))
         else {
             return Err(ApiError::unauthorized());
         };
 
-        Ok(TwitchUserId(claims.claims.twitch_user_id))
+        Ok(TwitchUser(claims.claims))
+    }
+}
+
+pub struct TwitchAdminUser(pub User);
+
+#[async_trait]
+impl axum::extract::FromRequestParts<Arc<Global>> for TwitchUser {
+    type Rejection = ApiError;
+
+    async fn from_request_parts(
+        req: &mut Parts,
+        global: &Arc<Global>,
+    ) -> Result<Self, Self::Rejection> {
+        TwitchUser::extract(req, global).await
+    }
+}
+
+#[async_trait]
+impl axum::extract::FromRequestParts<Arc<Global>> for TwitchAdminUser {
+    type Rejection = ApiError;
+
+    async fn from_request_parts(
+        req: &mut Parts,
+        global: &Arc<Global>,
+    ) -> Result<Self, Self::Rejection> {
+        let TwitchUser(twitch_user_id) = TwitchUser::extract(req, global).await?;
+
+        if !global
+            .config
+            .admin_twitch_ids
+            .contains(&twitch_user_id.twitch_user_id)
+        {
+            return Err(ApiError::unauthorized());
+        }
+
+        Ok(TwitchAdminUser(twitch_user_id))
     }
 }

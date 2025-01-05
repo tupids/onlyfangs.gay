@@ -1,4 +1,4 @@
-CREATE TYPE application_status AS ENUM ('pending', 'approved', 'maybe', 'rejected');
+CREATE TYPE application_status AS ENUM ('pending', 'approved', 'maybe', 'rejected', 'in');
 
 CREATE TYPE twitch_account_type AS ENUM ('pleb', 'affiliate', 'partner');
 
@@ -13,7 +13,6 @@ CREATE TABLE applications (
     reason TEXT NOT NULL CHECK (LENGTH(reason) <= 1000),
     support_clip_url TEXT NOT NULL CHECK (LENGTH(support_clip_url) <= 1000),
     follow_count INT NOT NULL,
-    connecting_ip_address INET NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     completed_at TIMESTAMPTZ

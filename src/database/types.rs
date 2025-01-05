@@ -2,8 +2,8 @@ use chrono::{DateTime, Utc};
 use diesel::{
     pg::Pg,
     prelude::Queryable,
-    query_dsl::methods::{FilterDsl, FindDsl, SelectDsl},
-    ExpressionMethods, OptionalExtension, Selectable, SelectableHelper,
+    query_dsl::methods::{FindDsl, SelectDsl},
+    OptionalExtension, Selectable, SelectableHelper,
 };
 use diesel_async::AsyncPgConnection;
 use diesel_async::RunQueryDsl;
@@ -62,19 +62,4 @@ pub struct ApplicationComment {
     pub twitch_display_name: String,
     pub twitch_profile_image_url: String,
     pub created_at: DateTime<Utc>,
-}
-
-impl ApplicationComment {
-    pub async fn fetch_by_application_id(
-        conn: &mut AsyncPgConnection,
-        application_id: i32,
-    ) -> anyhow::Result<Vec<Self>> {
-        let comments: Vec<Self> = schema::application_comments::dsl::application_comments
-            .filter(schema::application_comments::dsl::application_id.eq(application_id))
-            .select(ApplicationComment::as_select())
-            .load(conn)
-            .await?;
-
-        Ok(comments)
-    }
 }

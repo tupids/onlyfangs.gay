@@ -9,7 +9,10 @@ diesel-async = { version = "0.5.2", features = ["postgres", "bb8", "async-connec
 chrono = { version = "0.4.39", features = ["serde"] }
 tokio = { version = "1.39.0", features = ["full"] }
 futures = "0.3.31"
-axum = { version = "0.7.9", features = ["macros"] }
+
+# Pinned because scuffle-http has not been updated to support axum 0.8
+axum = { version = "=0.7.9", features = ["macros"] }
+
 smart-default = "0.7.1"
 serde = { version = "1.0.215", features = ["derive"] }
 serde_json = "1.0.134"
