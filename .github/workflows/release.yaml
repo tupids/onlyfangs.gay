@@ -73,4 +73,9 @@ jobs:
 
       - name: Deploy
         run: |
-          kubectl apply -f k8s.yaml
+          helm upgrade \
+            --install onlyfangs \
+            -n default \
+            -f ./deploy/values.yaml \
+            --set image.tag=${{ github.sha }} \
+            ./helm
