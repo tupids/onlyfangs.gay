@@ -50,7 +50,7 @@ jobs:
         with:
           context: .
           file: Dockerfile
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           push: true
 
       - name: Generate artifact attestation
